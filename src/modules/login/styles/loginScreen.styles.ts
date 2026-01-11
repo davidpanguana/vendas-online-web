@@ -9,7 +9,11 @@ export const BackgroundImage = styled.img`
     object-fit: cover;
 `;
 
-export const LogoImage = styled.img``;
+export const LogoImage = styled.img`
+    position: relative;
+    margin: auto;
+    max-width: 50%;
+`;
 
 export const LoginConteiner = styled.div`
     display: flex;
@@ -27,6 +31,8 @@ export const LoginConteiner = styled.div`
 
 export const LimitedConteiner = styled.div`
     width: 80%;
+    max-height:210px;
     position: relative;
     background-color: #f0f;
+    text-align: center;
 `;
