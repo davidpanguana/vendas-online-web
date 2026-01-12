@@ -30,9 +30,9 @@ export const LoginConteiner = styled.div`
 `;
 
 export const LimitedConteiner = styled.div`
+    padding: 0px;
     width: 80%;
-    max-height:210px;
-    position: relative;
-    background-color: #f0f;
+    margin-bottom: 4px;
     text-align: center;
+    border: 2px solid #000000ff;
 `;

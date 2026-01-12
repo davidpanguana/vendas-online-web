@@ -1,4 +1,5 @@
 import {BackgroundImage, LoginConteiner, LogoImage,LimitedConteiner} from "../styles/loginScreen.styles"
+import { InputDefault } from "../../../shared/inputs/inputDefault/inputDefault";
 
 const LoginScreen = () => {
   return (
@@ -8,8 +9,9 @@ const LoginScreen = () => {
         <LimitedConteiner>
           <LogoImage src="./logo.png"/>
         </LimitedConteiner>
+        <InputDefault title = "Username" />
+        <InputDefault title = "Password"/>
       </LoginConteiner>
-
     </div>
   );
 }
