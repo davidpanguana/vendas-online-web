@@ -2,6 +2,7 @@ import {BackgroundImage, LoginConteiner, LogoImage,LimitedConteiner,TitleLogin} 
 import { InputDefault } from "../../../shared/inputs/inputDefault/inputDefault";
 import Button from  "../../../shared/buttons/button/button";
 import { useState } from "react";
+import axios from "axios";
 
 
 const LoginScreen = () => {
@@ -15,6 +16,25 @@ const LoginScreen = () => {
   const handlePassword = (event: React.ChangeEvent<HTMLInputElement>) =>{
     setPassword(event.target.value);
   }
+
+  const handligLogin = async () => {
+    // Send a POST request
+    await axios({
+      method: 'post',
+      url:  `http://localhost:8080/auth`,
+      data: {
+        email: username,
+        password: userPassword,
+      }
+    })
+      .then((response) => {
+        alert(`login successful! welcome ${response.data.accessToken}`);
+        return response.data;
+      })
+      .catch(() =>{
+        alert("user or password incorrect")
+      });
+  }
   
   return (
     <div>
@@ -26,7 +46,7 @@ const LoginScreen = () => {
         <TitleLogin level={2} type="secondary">LOGIN</TitleLogin>
         <InputDefault title = "Username" margin= "16px 0px 16px" onChange={handleUsername} value={username} />
         <InputDefault type = 'password' title = "Password" margin= "16px 0px 16px" onChange={handlePassword} value={userPassword}/>
-        <Button type="primary" margin= "16px 0px 16px 0px" >ENTRAR</Button>
+        <Button type="primary" margin= "16px 0px 16px 0px" onClick={handligLogin} >ENTRAR</Button>
       </LoginConteiner>
     </div>
   );
