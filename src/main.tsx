@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ReactDOM from "react-dom/client";
-import { LoginRoute } from "./modules/login/routes";
+import { LoginRoute } from "./modules/login/Routes";
 import type {JSX} from "react";
+import { GlobalProvider, GlobalContext } from "./shared/hooks/useGlobalContext";
 
 
 export function MainRoutes(): JSX.Element {
@@ -18,9 +19,11 @@ const root = document.getElementById("root")!;
 
 ReactDOM.createRoot(root).render(
   <BrowserRouter>
-    <Routes>
-    {LoginRoute()}
-    {MainRoutes()}
-</Routes> 
+    <GlobalProvider>
+      <Routes>
+        {LoginRoute()}
+        {MainRoutes()}
+      </Routes>
+    </GlobalProvider>
   </BrowserRouter>,
 );

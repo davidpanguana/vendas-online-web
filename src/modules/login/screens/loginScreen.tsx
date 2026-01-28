@@ -1,14 +1,19 @@
 import {BackgroundImage, LoginConteiner, LogoImage,LimitedConteiner,TitleLogin} from "../styles/loginScreen.styles"
-import { InputDefault } from "../../../shared/inputs/inputDefault/inputDefault";
-import Button from  "../../../shared/buttons/button/button";
-import { useState } from "react";
+import { InputDefault } from "../../../shared/components/inputs/inputDefault/inputDefault";
+import Button from  "../../../shared/components/buttons/button/button";
+import { useContext, useState } from "react";
 import axios from "axios";
+import { useRequests } from "../../../shared/hooks/useRequests";
+import { useGlobalContext } from "../../../shared/hooks/useGlobalContext";
 
 
 const LoginScreen = () => {
 
   const [username, setUsername] = useState('');
   const [userPassword, setPassword] = useState('');
+  const { postRequest, loading } = useRequests();
+  const {accessToken, setAccessToken} = useGlobalContext();
+
 
   const handleUsername = (event: React.ChangeEvent<HTMLInputElement>) =>{
     setUsername(event.target.value);
@@ -17,23 +22,13 @@ const LoginScreen = () => {
     setPassword(event.target.value);
   }
 
-  const handligLogin = async () => {
+  const handligLogin = () => {
     // Send a POST request
-    await axios({
-      method: 'post',
-      url:  `http://localhost:8080/auth`,
-      data: {
+    setAccessToken("new token");
+    postRequest("http://localhost:8080/auth", {
         email: username,
         password: userPassword,
-      }
-    })
-      .then((response) => {
-        alert(`login successful! welcome ${response.data.accessToken}`);
-        return response.data;
       })
-      .catch(() =>{
-        alert("user or password incorrect")
-      });
   }
   
   return (
@@ -43,10 +38,10 @@ const LoginScreen = () => {
         <LimitedConteiner>
           <LogoImage src="./logo1.png"/>
         </LimitedConteiner>
-        <TitleLogin level={2} type="secondary">LOGIN</TitleLogin>
+        <TitleLogin level={2} type="secondary">LOGIN ({accessToken})</TitleLogin>
         <InputDefault title = "Username" margin= "16px 0px 16px" onChange={handleUsername} value={username} />
         <InputDefault type = 'password' title = "Password" margin= "16px 0px 16px" onChange={handlePassword} value={userPassword}/>
-        <Button type="primary" margin= "16px 0px 16px 0px" onClick={handligLogin} >ENTRAR</Button>
+        <Button loading={loading} type="primary" margin= "16px 0px 16px 0px" onClick={handligLogin} >ENTRAR</Button>
       </LoginConteiner>
     </div>
   );
