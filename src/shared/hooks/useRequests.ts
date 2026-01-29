@@ -1,6 +1,7 @@
 import {useState} from "react";
 import axios from "axios";
 import { useGlobalContext } from "./useGlobalContext";
+import { connectAPIPOST } from "../functions/connections/connection.API";
 
 export const useRequests = () =>{
     const [loading, setLoading] = useState(false);
@@ -24,17 +25,13 @@ export const useRequests = () =>{
     }
     const postRequest = async (url: string, data: any) =>{
         setLoading(true);
-        return await axios({
-            method: 'post',
-            url:  url,
-            data: data,
-        })
+        return await connectAPIPOST(url, data)
         .then((response) => {
             setNotification(`login successful! welcome`, "success");
-            return response.data;
+            return response;
         })
-        .catch(() =>{
-            setNotification("user or password incorrect", "error");
+        .catch((error) =>{
+            setNotification(error.message, "error");
         })
         .finally(() => {
             setLoading(false);
