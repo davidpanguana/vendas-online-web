@@ -45,7 +45,7 @@ export const useGlobalContext = () => {
     });
   }
 
-  const setNotification = (message: string, type: NotificationType, description: string) => {
+  const setNotification = (message: string, type: NotificationType, description?: string) => {
     setGlobalData({
         ...globalData,
         notification: {
