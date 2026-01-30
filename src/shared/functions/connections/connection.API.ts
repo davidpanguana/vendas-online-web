@@ -4,7 +4,7 @@ import { ErrorStatus } from "../../constants/errorStatus";
 
 export default class ConnectionAPI {
     
-    static async call<T>(url: string, method: string, body?: any) {
+    static async call<T>(url: string, method: string, body?: any): Promise<T> {
         
         switch (method) {
             case MethodsEnum.GET:
@@ -22,7 +22,7 @@ export default class ConnectionAPI {
         }       
     }
 
-    static async connect<T>(url: string, method: string, body?: any) {
+    static async connect<T>(url: string, method: string, body?: any): Promise<T> {
         return await this.call<T>(url, method, body).catch((error) => {
             if (error.response) {
                 switch (error.response.status) {
@@ -39,23 +39,25 @@ export default class ConnectionAPI {
                     default:
                         throw new Error(`Error: ${error.response.status}`);
                 };
-            };
+            }else {
+                throw new Error('Network Error');
+            }
         });
     };
 };
 
-export const connectAPIGET = async <T>(url: string) => {
+export const connectAPIGET = async <T>(url: string): Promise<T> => {
     return await ConnectionAPI.connect<T>(url, MethodsEnum.GET);
 };
 
-export const connectAPIDELETE = async <T>(url: string) => {
+export const connectAPIDELETE = async <T>(url: string): Promise<T> => {
     return await ConnectionAPI.connect<T>(url, MethodsEnum.DELETE);
 };
 
-export const connectAPIPOST = async <T>(url: string, body: any) => {
+export const connectAPIPOST = async <T>(url: string, body: any): Promise<T> => {
     return await ConnectionAPI.connect<T>(url, MethodsEnum.POST, body);
 }
-export const connectAPIPUT = async <T>(url: string, body: any) => {
+export const connectAPIPUT = async <T>(url: string, body: any): Promise<T> => {
     return await ConnectionAPI.connect<T>(url, MethodsEnum.PUT, body);
 };
 

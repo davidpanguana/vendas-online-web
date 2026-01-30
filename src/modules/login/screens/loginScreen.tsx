@@ -5,6 +5,7 @@ import { useContext, useState } from "react";
 import axios from "axios";
 import { useRequests } from "../../../shared/hooks/useRequests";
 import { useGlobalContext } from "../../../shared/hooks/useGlobalContext";
+import type { UserType } from "../types/userType";
 
 
 const LoginScreen = () => {
@@ -22,13 +23,17 @@ const LoginScreen = () => {
     setPassword(event.target.value);
   }
 
-  const handligLogin = () => {
+  const handligLogin = async () => {
     // Send a POST request
-    setAccessToken("new token");
-    postRequest("http://localhost:8080/auth", {
+    const user = await postRequest<UserType>("http://localhost:8080/auth", {
         email: username,
         password: userPassword,
-      })
+      });
+      if(user?.accessToken){
+        setAccessToken(user.accessToken);
+      }else{
+        setAccessToken('');
+      }
   }
   
   return (

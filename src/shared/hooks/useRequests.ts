@@ -23,15 +23,16 @@ export const useRequests = () =>{
             setLoading(false);
         });
     }
-    const postRequest = async (url: string, data: any) =>{
+    const postRequest = async <T>(url: string, data: any):Promise<T | undefined> => {
         setLoading(true);
-        return await connectAPIPOST(url, data)
+        return await connectAPIPOST<T>(url, data)
         .then((response) => {
             setNotification(`login successful! welcome`, "success");
             return response;
         })
         .catch((error) =>{
             setNotification(error.message, "error");
+            return undefined;
         })
         .finally(() => {
             setLoading(false);
