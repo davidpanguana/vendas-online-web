@@ -2,7 +2,6 @@ import {BackgroundImage, LoginConteiner, LogoImage,LimitedConteiner,TitleLogin} 
 import { InputDefault } from "../../../shared/components/inputs/inputDefault/inputDefault";
 import Button from  "../../../shared/components/buttons/button/button";
 import { useContext, useState } from "react";
-import axios from "axios";
 import { useRequests } from "../../../shared/hooks/useRequests";
 import { useGlobalContext } from "../../../shared/hooks/useGlobalContext";
 import type { UserType } from "../types/userType";

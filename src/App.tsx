@@ -1,13 +1,15 @@
 import { Routes, Route } from "react-router-dom";
-import { LoginRoute } from "./modules/login/Routes";
+import { LoginRoute } from "./modules/login/routes";
 import type {JSX} from "react";
 import { useNotification } from "./shared/hooks/useNotification";
+import { firstScreenRoute } from "./modules/firstScreen/routes";
+import { ProductRoute } from "./modules/product/screens/routes";
 
 
 export function MainRoutes(): JSX.Element {
   return (
     <>
-      <Route index element={<h1>Hello world!</h1>} />
+      
       <Route path="*" element={<h1>Page not found!</h1>} />
     </>
   );
@@ -21,6 +23,8 @@ function App() {
       {contextHolder}
       <Routes>
         {LoginRoute()}
+        {firstScreenRoute()}
+        {ProductRoute()}
         {MainRoutes()}
       </Routes>
     </>
