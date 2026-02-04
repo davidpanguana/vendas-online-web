@@ -1,49 +1,64 @@
-import axios from "axios";
+import axios, { type AxiosRequestConfig } from "axios";
 import { MethodsEnum } from "../../enums/methods.enums";
-import { ErrorStatus } from "../../constants/errorStatus";
+import { ErrorMessages, HttpStatus } from "../../constants/errorStatus";
+import { getAuthorizationToken } from "./auth";
+
+
+const errorMessageByStatus: Record<number, string> = {
+    [HttpStatus.BAD_REQUEST]: ErrorMessages.BAD_REQUEST,
+    [HttpStatus.UNAUTHORIZED]: ErrorMessages.INVALID_CREDENTIALS,
+    [HttpStatus.FORBIDDEN]: ErrorMessages.ACCESS_DENIED,
+    [HttpStatus.NOT_FOUND]: ErrorMessages.NOT_FOUND,
+    [HttpStatus.INTERNAL_SERVER_ERROR]: ErrorMessages.SERVER_ERROR,
+};
+
 
 export default class ConnectionAPI {
     
     static async call<T>(url: string, method: string, body?: any): Promise<T> {
         
+        const config: AxiosRequestConfig = {
+            headers: {
+                Authorization: getAuthorizationToken(),
+                "Content-Type": "application/json",
+            },
+        };
         switch (method) {
             case MethodsEnum.GET:
-                return (await axios.get<T>(url)).data;
+                return (await axios.get<T>(url, config)).data;
             case MethodsEnum.DELETE:
-                return (await axios.delete<T>(url)).data;
+                return (await axios.delete<T>(url, config)).data;
             case MethodsEnum.POST:
-                return (await axios.post<T>(url, body)).data;
+                return (await axios.post<T>(url, body, config)).data;
             case MethodsEnum.PUT:
-                return (await axios.put<T>(url, body)).data;
+                return (await axios.put<T>(url, body, config)).data;
             case MethodsEnum.PATCH:
-                return (await axios.patch<T>(url, body)).data;
+                return (await axios.patch<T>(url, body, config)).data;
             default:
                 throw new Error(`Method ${method} not supported`);
         }       
     }
 
     static async connect<T>(url: string, method: string, body?: any): Promise<T> {
-        return await this.call<T>(url, method, body).catch((error) => {
-            if (error.response) {
-                switch (error.response.status) {
-                    case 400:
-                        throw new Error(ErrorStatus.BAD_REQUEST.toString());
-                    case 401:
-                        throw new Error(ErrorStatus.UNAUTHORIZED.toString());
-                    case 403:
-                        throw new Error(ErrorStatus.FORBIDDEN.toString());
-                    case 404:
-                        throw new Error(ErrorStatus.NOT_FOUND.toString());
-                    case 500:
-                        throw new Error(ErrorStatus.INTERNAL_SERVER_ERROR.toString());
-                    default:
-                        throw new Error(`Error: ${error.response.status}`);
-                };
-            }else {
-                throw new Error('Network Error');
-            }
-        });
-    };
+    try {
+        return await this.call<T>(url, method, body);
+    } catch (error: any) {
+
+        if (error.response) {
+            const status = error.response.status;
+
+            const message =
+                error.response?.data?.message ||
+                errorMessageByStatus[status] ||
+                `Unexpected error: ${status}`;
+
+            throw new Error(message);
+        }
+
+        throw new Error("Network Error");
+    }
+}
+
 };
 
 export const connectAPIGET = async <T>(url: string): Promise<T> => {

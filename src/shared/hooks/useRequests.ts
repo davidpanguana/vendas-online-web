@@ -2,10 +2,16 @@ import {useState} from "react";
 import axios from "axios";
 import { useGlobalContext } from "./useGlobalContext";
 import { connectAPIPOST } from "../functions/connections/connection.API";
+import { AUTH_URL } from "../constants/url";
+import { useNavigate } from "react-router-dom";
+import { ProductRoutesEnum } from "../../modules/product/screens/routes";
+import { setAuthorizationToken } from "../functions/connections/auth";
+import type { AuthType } from "../../modules/login/types/authType";
 
 export const useRequests = () =>{
     const [loading, setLoading] = useState(false);
     const {setNotification} = useGlobalContext();
+    const navigate = useNavigate();
 
     const getRequest = async (url: string) =>{
         setLoading(true);
@@ -38,10 +44,27 @@ export const useRequests = () =>{
             setLoading(false);
         });
     }
+    const authRequest = async ( body: any):Promise<void> => {
+        setLoading(true);
+        await connectAPIPOST<AuthType>(AUTH_URL, body)
+        .then((response) => {
+
+            navigate(ProductRoutesEnum.PRODUCT);
+            setAuthorizationToken(response.accessToken);
+            setNotification(`loading...`, "success");
+        })
+        .catch((error) =>{
+            setNotification(error.message, "error");
+        })
+        .finally(() => {
+            setLoading(false);
+        });
+    }
 
     return {
         loading,
         getRequest,
-        postRequest
+        postRequest,
+        authRequest
     }
 }

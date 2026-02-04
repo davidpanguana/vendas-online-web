@@ -1,9 +1,8 @@
 import {BackgroundImage, LoginConteiner, LogoImage,LimitedConteiner,TitleLogin} from "../styles/loginScreen.styles"
 import { InputDefault } from "../../../shared/components/inputs/inputDefault/inputDefault";
 import Button from  "../../../shared/components/buttons/button/button";
-import { useContext, useState } from "react";
+import {useState } from "react";
 import { useRequests } from "../../../shared/hooks/useRequests";
-import { useGlobalContext } from "../../../shared/hooks/useGlobalContext";
 import type { UserType } from "../types/userType";
 
 
@@ -11,8 +10,8 @@ const LoginScreen = () => {
 
   const [username, setUsername] = useState('');
   const [userPassword, setPassword] = useState('');
-  const { postRequest, loading } = useRequests();
-  const {accessToken, setAccessToken} = useGlobalContext();
+  const { authRequest, loading } = useRequests();
+
 
 
   const handleUsername = (event: React.ChangeEvent<HTMLInputElement>) =>{
@@ -22,19 +21,13 @@ const LoginScreen = () => {
     setPassword(event.target.value);
   }
 
-  const handligLogin = async () => {
+  const handligLogin = () => {
     // Send a POST request
-    const user = await postRequest<UserType>("http://localhost:8080/auth", {
+    authRequest( {
         email: username,
         password: userPassword,
       });
-      if(user?.accessToken){
-        setAccessToken(user.accessToken);
-      }else{
-        setAccessToken('');
-      }
-  }
-  
+    }
   return (
     <div>
       <BackgroundImage src="./background.png"/>
@@ -42,7 +35,7 @@ const LoginScreen = () => {
         <LimitedConteiner>
           <LogoImage src="./logo1.png"/>
         </LimitedConteiner>
-        <TitleLogin level={2} type="secondary">LOGIN ({accessToken})</TitleLogin>
+        <TitleLogin level={2} type="secondary">LOGIN</TitleLogin>
         <InputDefault title = "Username" margin= "16px 0px 16px" onChange={handleUsername} value={username} />
         <InputDefault type = 'password' title = "Password" margin= "16px 0px 16px" onChange={handlePassword} value={userPassword}/>
         <Button loading={loading} type="primary" margin= "16px 0px 16px 0px" onClick={handligLogin} >ENTRAR</Button>
