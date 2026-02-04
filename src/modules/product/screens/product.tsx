@@ -1,5 +1,8 @@
+import { useGlobalContext } from "../../../shared/hooks/useGlobalContext";
 
 const Product = () => {
-  return <h1>Product Screen</h1>;
+  const { user } = useGlobalContext();
+
+  return <h1>{`Welcome ${user?.name || 'Guest'}`}</h1>;
 }
 export default Product;

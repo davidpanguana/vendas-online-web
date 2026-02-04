@@ -10,7 +10,7 @@ import type { AuthType } from "../../modules/login/types/authType";
 
 export const useRequests = () =>{
     const [loading, setLoading] = useState(false);
-    const {setNotification} = useGlobalContext();
+    const {setNotification, setUser} = useGlobalContext();
     const navigate = useNavigate();
 
     const getRequest = async (url: string) =>{
@@ -48,9 +48,9 @@ export const useRequests = () =>{
         setLoading(true);
         await connectAPIPOST<AuthType>(AUTH_URL, body)
         .then((response) => {
-
-            navigate(ProductRoutesEnum.PRODUCT);
             setAuthorizationToken(response.accessToken);
+            setUser(response.user);
+            navigate(ProductRoutesEnum.PRODUCT);
             setNotification(`loading...`, "success");
         })
         .catch((error) =>{
