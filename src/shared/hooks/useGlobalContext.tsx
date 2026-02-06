@@ -17,6 +17,9 @@ interface GlobalData{
 }
 
 import type { Dispatch, SetStateAction } from "react";
+import { getAuthorizationToken, unsetAuthorizationToken } from "../functions/connections/auth";
+import { connectAPIGET } from "../functions/connections/connection.API";
+import { USER_URL } from "../constants/url";
 
 interface GlobalDataProps{
     globalData: GlobalData;
@@ -32,6 +35,26 @@ interface GlobalProviderProps{
 
 export function GlobalProvider({children}: GlobalProviderProps){
     const [globalData, setGlobalData] = useState<GlobalData>({})
+
+      useEffect(() => {
+    const loadUser = async () => {
+      const token = getAuthorizationToken();
+
+      if (token) {
+        try {
+          const user = await connectAPIGET<UserType>(USER_URL);
+          setGlobalData(prev => ({
+            ...prev,
+            user,
+          }));
+        } catch {
+          unsetAuthorizationToken();
+        }
+      }
+    };
+
+    loadUser();
+  }, []);
     
     return(
         <GlobalContext.Provider value={{globalData, setGlobalData}}>
