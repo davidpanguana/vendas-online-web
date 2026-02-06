@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { ProductRoutesEnum } from "../../modules/product/screens/routes";
 import { setAuthorizationToken } from "../functions/connections/auth";
 import type { AuthType } from "../../modules/login/types/authType";
+import { FirstScreenRoutesEnum } from "../../modules/firstScreen/routes";
 
 export const useRequests = () =>{
     const [loading, setLoading] = useState(false);
@@ -48,9 +49,10 @@ export const useRequests = () =>{
         setLoading(true);
         await connectAPIPOST<AuthType>(AUTH_URL, body)
         .then((response) => {
+            console.log(response);
             setAuthorizationToken(response.accessToken);
             setUser(response.user);
-            navigate(ProductRoutesEnum.PRODUCT);
+            navigate(FirstScreenRoutesEnum.FIRST_SCREEN);
             setNotification(`loading...`, "success");
         })
         .catch((error) =>{

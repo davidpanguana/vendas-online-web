@@ -16,10 +16,13 @@ interface GlobalData{
     user?: UserType;
 }
 
+import type { Dispatch, SetStateAction } from "react";
+
 interface GlobalDataProps{
     globalData: GlobalData;
-    setGlobalData: (data: GlobalData) => void;
+    setGlobalData: Dispatch<SetStateAction<GlobalData>>;
 }
+
 
 export const GlobalContext = createContext({} as GlobalDataProps);
 
@@ -51,10 +54,11 @@ export const useGlobalContext = () => {
     });
   }
   const setUser = (user:UserType) => {
-    setGlobalData({
-        ...globalData,
+    setGlobalData(prev => ({
+        ...prev,
         user,
-    });
+        }));
+
   }
     
     return{

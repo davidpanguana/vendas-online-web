@@ -9,8 +9,7 @@ import { ProductRoute } from "./modules/product/screens/routes";
 export function MainRoutes(): JSX.Element {
   return (
     <>
-      
-      <Route path="*" element={<h1>Page not found!</h1>} />
+      <Route path="*" element={<h1>Page not found!</h1>}/>
     </>
   );
 }
