@@ -27,7 +27,10 @@ export const useRequests = () =>{
             return response;
         })
         .catch((error:Error) =>{
-            setNotification(error.message, "error");
+            setNotification({
+                message: error.message,
+                type: "error",
+            });
            return undefined
         })
         .finally(() => {
@@ -40,34 +43,44 @@ export const useRequests = () =>{
         setLoading(true);
         return await connectAPIPOST<T>(url, data)
         .then((response) => {
-            setNotification(`login successful! welcome`, "success");
+            setNotification({
+                message: "Login successful! Welcome",
+                type: "success",
+            });
+
             return response;
         })
         .catch((error) =>{
-            setNotification(error.message, "error");
+            setNotification({
+                message: error.message,
+                type: "error",
+            });
             return undefined;
         })
         .finally(() => {
             setLoading(false);
         });
     }
-    const authRequest = async ( body: any):Promise<void> => {
-        setLoading(true);
-        await connectAPIPOST<AuthType>(AUTH_URL, body)
-        .then((response) => {
-            console.log(response);
-            setAuthorizationToken(response.accessToken);
-            setUser(response.user);
-            navigate(ProductRoutesEnum.PRODUCT);
-            setNotification(`loading...`, "success");
-        })
-        .catch((error) =>{
-            setNotification(error.message, "error");
-        })
-        .finally(() => {
-            setLoading(false);
-        });
-    }
+   const authRequest = async (body: any): Promise<void> => {
+  setLoading(true);
+
+  try {
+    const response = await connectAPIPOST<AuthType>(AUTH_URL, body);
+
+    setAuthorizationToken(response.accessToken);
+    setUser(response.user);
+    navigate(ProductRoutesEnum.PRODUCT);
+  } catch (error: any) {
+    setNotification({
+        message: error.message,
+        type: "error",
+    });
+
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     return {
         loading,

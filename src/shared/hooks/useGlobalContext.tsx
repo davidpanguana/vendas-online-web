@@ -1,24 +1,25 @@
-import { createContext, useContext,useState } from "react";
+import { createContext, useContext,useEffect,useState } from "react";
 import type { UserType } from "../../modules/login/types/userType";
+import { getAuthorizationToken, unsetAuthorizationToken } from "../functions/connections/auth";
+import { connectAPIGET } from "../functions/connections/connection.API";
+import { USER_URL } from "../constants/url";
+
 
 
 type NotificationType = 'success' | 'info' | 'warning' | 'error';
 
-
 interface NotificationProps {
-    message?: string;
-    type?: NotificationType;
-    description?: string;
-}
-
-interface GlobalData {
-    notification?: NotificationProps;
-    user?: UserType;
+  message?: string;
+  type?: NotificationType;
+  description?: string;
 }
 
 interface GlobalContextProps {
-    globalData: GlobalData;
-    setGlobalData: (globalData: GlobalData) => void;
+  user?: UserType;
+  loading: boolean;
+  notification?: NotificationProps;
+  setUser: (user?: UserType) => void;
+  setNotification: (notification?: NotificationProps) => void;
 }
 
 
@@ -28,40 +29,51 @@ interface GlobalProviderProps {
     children: React.ReactNode
 }
 
-export const GlobalProvider = ({children}: GlobalProviderProps) => {
-  const [globalData, setGlobalData] = useState<GlobalData>({});
+export const GlobalProvider = ({ children }: GlobalProviderProps) => {
+  const [user, setUser] = useState<UserType | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState<NotificationProps | undefined>(undefined);
 
-  return(
-    <GlobalContext.Provider value={{ globalData, setGlobalData}}>
+  useEffect(() => {
+    const validateUser = async () => {
+      const token = getAuthorizationToken();
+
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await connectAPIGET<UserType>(USER_URL);
+        setUser(response);
+      } catch {
+        unsetAuthorizationToken();
+        setUser(undefined);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    validateUser();
+  }, []);
+
+  return (
+    <GlobalContext.Provider
+      value={{
+        user,
+        setUser,
+        loading,
+        notification,
+        setNotification,
+      }}
+    >
       {children}
-    </GlobalContext.Provider >
-  )
-}
+    </GlobalContext.Provider>
+  );
+};
+
+
 
 export const useGlobalContext = () => {
-  const {globalData, setGlobalData} = useContext(GlobalContext);
-
-  const setNotification = (message: string, type: NotificationType, description?: string) => {
-    setGlobalData({
-        ...globalData,
-        notification: {
-            message,
-            type,
-            description
-        }
-    });
-  }
-  const setUser = (user:UserType) => {
-    setGlobalData({
-      ...globalData,
-      user,
-    });
-  }
-    
-    return{
-         notification: globalData?.notification,
-         user: globalData?.user,
-        setNotification,
-        setUser
-    }
-}
+  return useContext(GlobalContext);
+};
