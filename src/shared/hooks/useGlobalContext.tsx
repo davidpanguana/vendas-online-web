@@ -1,66 +1,41 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext,useState } from "react";
 import type { UserType } from "../../modules/login/types/userType";
+
 
 type NotificationType = 'success' | 'info' | 'warning' | 'error';
 
 
-interface NotificationProps{
+interface NotificationProps {
     message?: string;
     type?: NotificationType;
     description?: string;
 }
 
-interface GlobalData{
-    accessToken?: string;
+interface GlobalData {
     notification?: NotificationProps;
     user?: UserType;
 }
 
-import type { Dispatch, SetStateAction } from "react";
-import { getAuthorizationToken, unsetAuthorizationToken } from "../functions/connections/auth";
-import { connectAPIGET } from "../functions/connections/connection.API";
-import { USER_URL } from "../constants/url";
-
-interface GlobalDataProps{
+interface GlobalContextProps {
     globalData: GlobalData;
-    setGlobalData: Dispatch<SetStateAction<GlobalData>>;
+    setGlobalData: (globalData: GlobalData) => void;
 }
 
 
-export const GlobalContext = createContext({} as GlobalDataProps);
+const GlobalContext = createContext({} as GlobalContextProps);
 
-interface GlobalProviderProps{
+interface GlobalProviderProps {
     children: React.ReactNode
 }
 
-export function GlobalProvider({children}: GlobalProviderProps){
-    const [globalData, setGlobalData] = useState<GlobalData>({})
+export const GlobalProvider = ({children}: GlobalProviderProps) => {
+  const [globalData, setGlobalData] = useState<GlobalData>({});
 
-      useEffect(() => {
-    const loadUser = async () => {
-      const token = getAuthorizationToken();
-
-      if (token) {
-        try {
-          const user = await connectAPIGET<UserType>(USER_URL);
-          setGlobalData(prev => ({
-            ...prev,
-            user,
-          }));
-        } catch {
-          unsetAuthorizationToken();
-        }
-      }
-    };
-
-    loadUser();
-  }, []);
-    
-    return(
-        <GlobalContext.Provider value={{globalData, setGlobalData}}>
-            {children}
-        </GlobalContext.Provider>
-    )
+  return(
+    <GlobalContext.Provider value={{ globalData, setGlobalData}}>
+      {children}
+    </GlobalContext.Provider >
+  )
 }
 
 export const useGlobalContext = () => {
@@ -77,11 +52,10 @@ export const useGlobalContext = () => {
     });
   }
   const setUser = (user:UserType) => {
-    setGlobalData(prev => ({
-        ...prev,
-        user,
-        }));
-
+    setGlobalData({
+      ...globalData,
+      user,
+    });
   }
     
     return{
