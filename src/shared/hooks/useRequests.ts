@@ -1,34 +1,40 @@
 import {useState} from "react";
-import axios from "axios";
 import { useGlobalContext } from "./useGlobalContext";
-import { connectAPIPOST } from "../functions/connections/connection.API";
+import ConnectionAPI, { connectAPIPOST, type MethodType } from "../functions/connections/connection.API";
 import { AUTH_URL } from "../constants/url";
 import { useNavigate } from "react-router-dom";
 import { ProductRoutesEnum } from "../../modules/product/screens/routes";
 import { setAuthorizationToken } from "../functions/connections/auth";
 import type { AuthType } from "../../modules/login/types/authType";
-import { FirstScreenRoutesEnum } from "../../modules/firstScreen/routes";
 
 export const useRequests = () =>{
     const [loading, setLoading] = useState(false);
     const {setNotification, setUser} = useGlobalContext();
     const navigate = useNavigate();
 
-    const getRequest = async (url: string) =>{
+    const request = async <T>(
+        url: string,
+        method: MethodType,
+        sevGlobal?: (Object: T) => void,
+        body?: unknown
+    ): Promise<T| undefined> =>{
         setLoading(true);
-        return await axios({
-            method: 'get',
-            url:  url,
-        })
+        const returnObject: T | undefined   = await ConnectionAPI.connect <T> (url, method, body)
         .then((response) => {
-            return response.data;
+            if(sevGlobal){
+                sevGlobal(response);
+            }
+            return response;
         })
-        .catch(() =>{
-            alert("Error on get request")
+        .catch((error:Error) =>{
+            setNotification(error.message, "error");
+           return undefined
         })
         .finally(() => {
             setLoading(false);
+            return undefined;
         });
+        return returnObject;
     }
     const postRequest = async <T>(url: string, data: any):Promise<T | undefined> => {
         setLoading(true);
@@ -52,7 +58,7 @@ export const useRequests = () =>{
             console.log(response);
             setAuthorizationToken(response.accessToken);
             setUser(response.user);
-            navigate(FirstScreenRoutesEnum.FIRST_SCREEN);
+            navigate(ProductRoutesEnum.PRODUCT);
             setNotification(`loading...`, "success");
         })
         .catch((error) =>{
@@ -65,7 +71,7 @@ export const useRequests = () =>{
 
     return {
         loading,
-        getRequest,
+        request,
         postRequest,
         authRequest
     }

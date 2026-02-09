@@ -4,6 +4,8 @@ import { ErrorMessages, HttpStatus } from "../../constants/errorStatus";
 import { getAuthorizationToken } from "./auth";
 
 
+
+
 const errorMessageByStatus: Record<number, string> = {
     [HttpStatus.BAD_REQUEST]: ErrorMessages.BAD_REQUEST,
     [HttpStatus.UNAUTHORIZED]: ErrorMessages.INVALID_CREDENTIALS,
@@ -13,9 +15,10 @@ const errorMessageByStatus: Record<number, string> = {
 };
 
 
+export type MethodType = 'get' | 'post' | 'put' | 'patch' | 'delete';
 export default class ConnectionAPI {
     
-    static async call<T>(url: string, method: string, body?: any): Promise<T> {
+    static async call<T>(url: string, method: MethodType, body?: unknown): Promise<T> {
         
         const config: AxiosRequestConfig = {
             headers: {
@@ -23,23 +26,21 @@ export default class ConnectionAPI {
                 "Content-Type": "application/json",
             },
         };
-        switch (method) {
-            case MethodsEnum.GET:
-                return (await axios.get<T>(url, config)).data;
-            case MethodsEnum.DELETE:
-                return (await axios.delete<T>(url, config)).data;
-            case MethodsEnum.POST:
-                return (await axios.post<T>(url, body, config)).data;
-            case MethodsEnum.PUT:
-                return (await axios.put<T>(url, body, config)).data;
-            case MethodsEnum.PATCH:
-                return (await axios.patch<T>(url, body, config)).data;
-            default:
-                throw new Error(`Method ${method} not supported`);
-        }       
+        switch(method) {
+          case MethodsEnum.POST:
+          case MethodsEnum.PUT:
+          case MethodsEnum.PATCH:
+            return (await axios[method]<T>(url, body, config)).data;
+          case MethodsEnum.GET:
+          case MethodsEnum.DELETE:
+            return (await axios[method]<T>(url, config)).data;
+          default:
+            return((await axios[method](url, config)).data);
+        }
+            
     }
 
-    static async connect<T>(url: string, method: string, body?: any): Promise<T> {
+    static async connect<T>(url: string, method: MethodType, body?: any): Promise<T> {
     try {
         return await this.call<T>(url, method, body);
     } catch (error: any) {
@@ -55,7 +56,7 @@ export default class ConnectionAPI {
             throw new Error(message);
         }
 
-        throw new Error("Network Error");
+        throw new Error(error);
     }
 }
 

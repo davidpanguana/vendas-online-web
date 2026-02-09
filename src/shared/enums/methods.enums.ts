@@ -1,8 +1,8 @@
 
 export enum MethodsEnum {
-    GET = "GET",
-    POST = "POST",
-    PUT = "PUT",
-    DELETE = "DELETE",
-    PATCH = "PATCH"
+  GET = "get",
+  POST = "post",
+  PUT = "put",
+  PATCH = "patch",
+  DELETE = "delete"
 }
